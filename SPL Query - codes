@@ -1,0 +1,256 @@
+Pre Post Assessment details for Splunk training
+
+https://rpsconsulting-my.sharepoint.com/:x:/g/personal/srinath_ranga_rpsconsulting_in/IQBD9YLvNe0WT7_-BLcBcF0KAXdxWEXSEx85aYbtGGnGmwo?e=l9JshD
+
+
+GitHub URL ---> https://github.com/vivek9325/SPLK_BOA_16_03_2026.git
+
+
+index=_internal
+
+index=main source=Sample_tickets.csv 
+| table ticket_number, severity, current_ticket_state
+
+
+index=main source=Sample_tickets.csv 
+| table ticket_number, severity, current_ticket_state 
+| rename ticket_number AS incident_number, current_ticket_state AS ticket_name
+
+
+index=main source=Sample_tickets.csv 
+| table ticket_number, severity, current_ticket_state 
+| rename ticket_number AS incident_number, current_ticket_state AS ticket_name 
+| dedup severity
+
+Please find below, first day feedback link for Splunk training.
+
+https://survey.zohopublic.com/zs/kOC5Ok
+
+
+index=main source="sample_tickets.csv" | stats count BY current_ticket_state
+
+
+index=_internal sourcetype=splunkd_ui_access | stats sum(bytes) AS total_bytes
+
+index=_internal  | stats values(source) as source by sourcetype
+
+index=_internal  | stats list(source) as source by sourcetype
+
+
+index=_internal  sourcetype=splunkd_ui_access | table bytes | eval kb = round(bytes/1024,3)." KB"
+
+
+index=main source="Sample_tickets.csv" 
+| stats count by severity 
+| eval status = if(severity<3, "High", "Low")
+
+
+index=main source="Sample_tickets.csv" 
+| stats count by severity 
+| eval status = case(severity=1, "Critical", severity=2, "high", severity=3, "Low", 1=1, "Info")
+
+
+index=_internal | top limit=0 sourcetype
+
+index=_internal | rare limit=0 sourcetype
+
+
+index=_internal 
+| stats sum(bytes) as total_bytes BY sourcetype 
+| fillnull total_bytes value="NULL"
+
+
+index=main source="sample_tickets.csv" 
+| stats count by severity 
+| eval threshold=15 
+| where count > threshold 
+| search count >16
+
+
+index=main source="sample_tickets.csv" 
+| stats count by severity 
+| append
+    [ search index=_internal 
+    | stats count as total by sourcetype]
+
+
+index=main source="sample_tickets.csv" 
+| stats count by severity 
+| appendcols
+    [ search index=_internal 
+    | stats count as total by sourcetype]
+
+
+
+index=main source="sample_tickets.csv" 
+| stats count by severity, current_ticket_state 
+| appendpipe 
+    [| stats sum(count) as count by severity 
+    | eval current_ticket_state="Total Count by Serverity Wise" ] 
+| sort severity
+
+
+| makeresults 
+| eval string="Vivek" 
+| eval md5 = md5(string), sha256 = sha256(string), sha512 = sha512(string)
+
+
+| makeresults 
+| eval user="Vivek", response_time="200", status=null(), ip="10.0.0.1" 
+| eval check_isnull_check = if(isnull(status),"True", "False"), check_isnotnull_user = if(isnotnull(user), "True", "False"), check_isnum_response = if(isnum(response_time), "True", "False"), check_isstr_user = if(isstr(user), "True", "False"), datatype_response = typeof(response_time), user_length = len(user)
+
+
+| makeresults 
+| eval raw = "    Vivek,Arora,Bangalore,India     " 
+| eval trimmed = trim(raw), lower_case = lower(trimmed), upper_case = upper(trimmed), name_part = substr(trimmed,1,5), replaced = replace(trimmed, "Bangalore", "Karnataka"), name_length = len(name_part)
+
+
+
+| makeresults 
+| eval num_str="12345", text="Vivek" 
+| eval num = tonumber(num_str), str_num = tostring(num)
+
+
+index=main source=tutorialdata.zip* | transaction JSESSIONID, clientip
+
+
+index=main source="Sample_tickets.csv" 
+| table time_submitted, closed_date 
+| eval epoc_time_submitted = strptime(time_submitted, "%d-%m-%y %H:%M"), epoc_closed_date = strptime(closed_date, "%d-%m-%y %H:%M") 
+| eval difference = epoc_closed_date-epoc_time_submitted 
+| eval format_date = strftime(difference, "%H:%M")
+
+
+
+index=main source="Sample_tickets.csv" 
+| table time_submitted, closed_date 
+| eval epoc_time_submitted = strptime(time_submitted, "%d-%m-%y %H:%M"), epoc_closed_date = strptime(closed_date, "%d-%m-%y %H:%M") 
+| eval difference = epoc_closed_date-epoc_time_submitted 
+| eval format_date = strftime(difference, "%d %H:%M:%S")
+
+
+
+index=main source="Sample_tickets.csv" 
+| stats count by severity, current_ticket_state 
+| xyseries severity, current_ticket_state, count
+
+
+| makeresults 
+| eval raw = "Vivek,arora,india,vivek" 
+| eval mv_field=split(raw, ","), first=mvindex(mv_field,0), count=mvcount(mv_field), joined=mvjoin(mv_field, "-"), unique_vals=mvdedup(mv_field), appended = mvappend(mv_field, "admin")
+
+
+
+index=main sourcetype=txt | rex field=_raw "From:\s+<(?P<from_id>.*)>\s+To"
+
+
+index=main sourcetype=txt 
+| rex field=_raw "From:\s+<(?P<from_id>.*)>\s+To:\s+<(?P<to_id>.*)>" 
+| table from_id, to_id
+
+| makeresults 
+| eval text="Alis;search;saved_search" 
+| rex field=text "(?P<username>.*);(?P<app_name>.*);(?P<savedsearch_name>.*)"
+
+
+index=main source=data.txt | erex from_eamil examples="MariaDubois@example.com, Exit_Desk@sample.net"
+
+
+index=main source=data.txt |regex _raw = "From:\s+<[[:alnum:]]+@[[:alnum:]]+\.[[:alpha:]]+>"
+
+index=main sourcetype=xml | spath path=purchases.book.author output=author
+
+index=main sourcetype=xml | spath path=purchases.book.title{@yearPublished} output=year
+
+
+index=main source=mixed*  | rex field=_raw "xyz-\s+(?P<mixed_json>.*)" 
+
+| spath input=mixed_json path={}.timestamp output=timestamp
+
+
+index=main source=sample_tickets.csv | eventstats count BY current_ticket_state
+
+
+| makeresults count=3 
+| streamstats count
+
+
+index=main source=Sample_tickets.csv 
+| table ticket_number, severity, current_ticket_state 
+| join type=inner ticket_number
+    [ search index=main source=Sample_lookup.csv 
+    | table ticket_number, time_taken]
+
+
+index=main source=Sample_tickets.csv 
+| table ticket_number, severity, current_ticket_state 
+| join type=left ticket_number
+    [ search index=main source=Sample_lookup.csv ticket_number ="INC000020793170"
+    | table ticket_number, time_taken]
+
+
+
+index=_internal source=*metrics.log group=per_source_lb_cpu | timechart avg(cpu_time_ms) as cpu_time_ms | predict cpu_time_ms future_timespan=10
+
+
+
+index=_internal 
+| bin _time span=5m 
+| stats count by _time
+
+
+index=main source="Sample_tickets.csv" | timechart span=1y count by current_ticket_state
+
+round(bytes/1024,3)." KB" 
+
+
+
+index=main source=Sample_tickets.csv 
+| table ticket_number, severity, current_ticket_state 
+| lookup vk_sample_lookup.csv ticket_number OUTPUT time_taken AS time_consumed
+
+
+index=main source=Sample_tickets.csv 
+| table ticket_number, severity, current_ticket_state 
+| lookup vk_lookup_definition ticket_number OUTPUT time_taken AS time_consumed
+
+[vk_kvstore]
+enforceType = false
+field.id = string
+field.name = string
+accelerated_fields.my_accl = {"id" : 1}
+
+
+| makeresults 
+| fields - _time 
+| eval id="1", name="Vivek" 
+| outputlookup vk_sample_lookup.csv append=true
+
+|inputlookup vk_kvstore | eval key = _key
+
+
+| makeresults count=2 
+| streamstats count 
+| eval latitude=if(count=1,"15.317277","22.978624"), longitude=if(count=1,"75.713890","87.747803") 
+| lookup vk_india_states latitude, longitude 
+| stats count by featureId 
+| geom vk_india_states
+
+
+//Placemark/ExtendedData/Data[@name='Name']/value
+
+
+
+`vk_no_arg`
+
+`vk_single_arg(d)`
+
+*/2 * * * *
+
+https://webhook.site/
+
+imdex=main source=sample_ticket.csv | stats count by severity | collect index=summary testmode=false
+
+index=main source=Sample_tickets.csv | stats count by severity
+
+
