@@ -1,0 +1,308 @@
+{
+    "title": "vk_studio",
+    "description": "",
+    "inputs": {
+        "input_aJTZLF65": {
+            "dataSources": {
+                "primary": "ds_t0AffhvR"
+            },
+            "options": {
+                "defaultValue": "*",
+                "items": [
+                    {
+                        "label": "All",
+                        "value": "*"
+                    }
+                ],
+                "token": "sev"
+            },
+            "title": "Severity",
+            "type": "input.dropdown"
+        },
+        "input_global_trp": {
+            "options": {
+                "defaultValue": "0,",
+                "token": "time_token"
+            },
+            "title": "Time",
+            "type": "input.timerange"
+        },
+        "input_vZvza4Qz": {
+            "dataSources": {
+                "primary": "ds_yc2YpmAo"
+            },
+            "options": {
+                "defaultValue": [
+                    "*"
+                ],
+                "items": [
+                    {
+                        "label": "All",
+                        "value": "*"
+                    }
+                ],
+                "token": "ticket_state"
+            },
+            "title": "Ticket State",
+            "type": "input.multiselect"
+        }
+    },
+    "defaults": {
+        "dataSources": {
+            "ds.search": {
+                "options": {
+                    "queryParameters": {
+                        "earliest": "$global_time.earliest$",
+                        "latest": "$global_time.latest$"
+                    }
+                }
+            },
+            "ds.spl2": {
+                "options": {
+                    "queryParameters": {
+                        "earliest": "$global_time.earliest$",
+                        "latest": "$global_time.latest$"
+                    }
+                }
+            }
+        },
+        "visualizations": {
+            "global": {
+                "showProgressBar": true
+            }
+        }
+    },
+    "visualizations": {
+        "viz_1wB8urja": {
+            "containerOptions": {
+                "title": {
+                    "color": "#dc4e41"
+                }
+            },
+            "dataSources": {
+                "primary": "ds_JAgHjsBa"
+            },
+            "title": "Count By Asset ID",
+            "type": "splunk.line"
+        },
+        "viz_KFQnd7VO": {
+            "dataSources": {
+                "primary": "ds_yc2YpmAo"
+            },
+            "options": {
+                "dataValuesDisplay": "off",
+                "legendDisplay": "right",
+                "legendTruncation": "ellipsisMiddle",
+                "showIndependentYRanges": false,
+                "showOverlayY2Axis": false,
+                "showRoundedY2AxisLabels": false,
+                "showSplitSeries": false,
+                "showY2MajorGridLines": true,
+                "stackMode": "auto",
+                "xAxisLabelRotation": 0,
+                "xAxisTitleVisibility": "show",
+                "y2AxisAbbreviation": "auto",
+                "y2AxisScale": "linear",
+                "y2AxisTitleVisibility": "show",
+                "yAxisAbbreviation": "auto",
+                "yAxisScale": "linear",
+                "yAxisTitleVisibility": "show"
+            },
+            "title": "Count by ticket state",
+            "type": "splunk.column"
+        },
+        "viz_MbYUppYR": {
+            "containerOptions": {
+                "title": {
+                    "color": "#dc4e41"
+                },
+                "visibility": {}
+            },
+            "dataSources": {
+                "primary": "ds_PEn1UjBP"
+            },
+            "options": {
+                "areaOpacity": 0.43,
+                "backgroundColor": "transparent",
+                "legendDisplay": "right",
+                "seriesColors": [
+                    "#CB2196",
+                    "#009CEB",
+                    "#7B56DB",
+                    "#00CDAF",
+                    "#DD9900",
+                    "#FF677B",
+                    "#813193",
+                    "#0051B5",
+                    "#008C80",
+                    "#99B100",
+                    "#FFA476",
+                    "#FF6ACE",
+                    "#AE8CFF",
+                    "#00689D",
+                    "#00490A",
+                    "#465D00",
+                    "#9D6300",
+                    "#F6540B",
+                    "#FF969E",
+                    "#E47BFE"
+                ],
+                "seriesColorsByField": {},
+                "yAxisLabelVisibility": "show",
+                "yAxisScale": "log"
+            },
+            "showLastUpdated": false,
+            "showProgressBar": true,
+            "title": "Count by Severity",
+            "type": "splunk.area"
+        },
+        "viz_ldujRIjR": {
+            "dataSources": {
+                "primary": "ds_t0AffhvR"
+            },
+            "title": "Count by Asset ID",
+            "type": "splunk.pie"
+        }
+    },
+    "dataSources": {
+        "ds_34VSsRmo": {
+            "name": "base_search",
+            "options": {
+                "query": "index=main source=Sample_tickets.csv \n| stats count by severity, current_ticket_state, asset_id",
+                "queryParameters": {
+                    "earliest": "$time_token.earliest$",
+                    "latest": "$time_token.latest$"
+                }
+            },
+            "type": "ds.search"
+        },
+        "ds_JAgHjsBa": {
+            "name": "asset_id",
+            "options": {
+                "extend": "ds_34VSsRmo",
+                "query": "| search severity=$sev$| stats count by asset_id"
+            },
+            "type": "ds.chain"
+        },
+        "ds_KIekZpLw": {
+            "name": "vk_report",
+            "options": {
+                "app": "search",
+                "ref": "vk_report"
+            },
+            "type": "ds.savedSearch"
+        },
+        "ds_PEn1UjBP": {
+            "name": "count by severity - Column chart search",
+            "options": {
+                "query": "index=main source=Sample_tickets.csv current_ticket_state=\"$ticket_state$\" \n| stats count by severity",
+                "queryParameters": {
+                    "earliest": "$time_token.earliest$",
+                    "latest": "$time_token.latest$",
+                    "sampleRatio": 1
+                }
+            },
+            "type": "ds.search"
+        },
+        "ds_t0AffhvR": {
+            "name": "Search_1",
+            "options": {
+                "extend": "ds_KIekZpLw",
+                "query": "| stats count by severity"
+            },
+            "type": "ds.chain"
+        },
+        "ds_yc2YpmAo": {
+            "name": "Count by ticket state search",
+            "options": {
+                "query": "index=main source=Sample_tickets.csv | stats count BY current_ticket_state",
+                "queryParameters": {
+                    "earliest": "$time_token.earliest$",
+                    "latest": "$time_token.latest$",
+                    "sampleRatio": 1
+                }
+            },
+            "type": "ds.search"
+        }
+    },
+    "layout": {
+        "globalInputs": [
+            "input_global_trp",
+            "input_aJTZLF65",
+            "input_vZvza4Qz"
+        ],
+        "layoutDefinitions": {
+            "layout_1": {
+                "options": {
+                    "backgroundColor": "transparent",
+                    "height": 960,
+                    "width": 1440
+                },
+                "structure": [
+                    {
+                        "item": "viz_MbYUppYR",
+                        "position": {
+                            "h": 250,
+                            "w": 1440,
+                            "x": 0,
+                            "y": 0
+                        },
+                        "type": "block"
+                    },
+                    {
+                        "item": "viz_KFQnd7VO",
+                        "position": {
+                            "h": 300,
+                            "w": 1440,
+                            "x": 0,
+                            "y": 250
+                        },
+                        "type": "block"
+                    },
+                    {
+                        "item": "viz_1wB8urja",
+                        "position": {
+                            "h": 420,
+                            "w": 710,
+                            "x": 10,
+                            "y": 550
+                        },
+                        "type": "block"
+                    },
+                    {
+                        "item": "viz_ldujRIjR",
+                        "position": {
+                            "h": 400,
+                            "w": 710,
+                            "x": 720,
+                            "y": 550
+                        },
+                        "type": "block"
+                    }
+                ],
+                "type": "absolute"
+            },
+            "layout_P0D1yWSi": {
+                "structure": [],
+                "type": "grid"
+            }
+        },
+        "options": {},
+        "tabs": {
+            "items": [
+                {
+                    "label": "Tab No 1",
+                    "layoutId": "layout_1"
+                },
+                {
+                    "label": "Tab2",
+                    "layoutId": "layout_P0D1yWSi"
+                }
+            ]
+        }
+    },
+    "applicationProperties": {
+        "hideEdit": false,
+        "hideExport": false
+    }
+}
